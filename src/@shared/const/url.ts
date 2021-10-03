@@ -20,12 +20,17 @@ const DETAIL = '/detail';
  * END_POINT URL
  */
 export const URL = {
+
+    ADD_UPDATE: ADD_UPDATE,
+
     MJR_TX: BASE_CORE + '/tx',
     MJR_VEHICLE: BASE_CORE + '/vehicle',
+    MJR_USER: BASE_CORE + '/user',
 
     VEHICLE_LIST: LIST,
     // ORDER: MJR_TX + '/order',
     // TX_HISTORY: MJR_TX + '/history',
     ORDER_ALL: '/order-all',
-    ORDER_BY_NAME: '/order-by-name'
+    ORDER_BY_NAME: '/order-by-name',
+    
 };
