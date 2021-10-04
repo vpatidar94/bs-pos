@@ -2,6 +2,7 @@ import { Route } from './@shared/interface/route.interface'
 import express, { NextFunction, Request, Response } from 'express';
 import * as path from 'path';
 import mongoose from 'mongoose';
+import * as dotenv from "dotenv";
 
 class App {
     public app: express.Application;
@@ -68,7 +69,8 @@ class App {
     // }
 
     private connectToDatabase() {
-        const url = 'mongodb+srv://root:root123@cluster0.ko465.mongodb.net/db_bs_pos';
+        dotenv.config();
+        const url = process.env.DB_URL as string;
         mongoose.connect(url);
         const db = mongoose.connection;
         db.on("error", console.error.bind(console, "connection error: "));
