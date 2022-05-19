@@ -1,31 +1,68 @@
-import { URL } from '../const/url';
-import { ResponseUtility } from '../utility/response.utility';
-import { Router, Request, Response } from 'express';
-import { Route } from '../interface/route.interface';
-import { UserService } from '../service/user.service';
-import { UserVo } from 'codeartist-core';
+import {URL} from '../const/url';
+import {ResponseUtility} from '../utility/response.utility';
+import {Request, Response, Router} from 'express';
+import {Route} from '../interface/route.interface';
+import {UserService} from '../service/user.service';
+import {UserAuthDto, UserPasswordDto, UserVo} from 'codeartist-core';
+import passwordMiddleware from "../middleware/password.middleware";
+import authMiddleware from "../middleware/auth.middleware";
 
 class UserApi implements Route {
-  public path = URL.MJR_USER;
-  public router = Router();
+    public path = URL.MJR_USER;
+    public router = Router();
 
-  private userService = new UserService();
+    private userService = new UserService();
 
-  constructor() {
-    this.initializeRoutes();
-  }
+    constructor() {
+        this.initializeRoutes();
+    }
 
-  private initializeRoutes() {
+    private initializeRoutes() {
 
-    // /api/core/v1/user/app-update
-    this.router.post(`${this.path}${URL.ADD_UPDATE}`, async (req: Request, res: Response) => {
-      try {
-        const user = await this.userService.saveUser(req.body as UserVo);
-        ResponseUtility.sendSuccess(res, user);
-      } catch (error) {
-        ResponseUtility.sendFailResponse(res, error);
-      }
-    });
-  }
+        // /api/core/v1/user/app-update
+        this.router.post(`${this.path}${URL.ADD_UPDATE}`, authMiddleware, async (req: Request, res: Response) => {
+            try {
+                const user = await this.userService.saveUser(req.body as UserVo);
+                if (!user) {
+                    ResponseUtility.sendFailResponse(res, null, 'User already exists');
+                    return;
+                }
+                ResponseUtility.sendSuccess(res, user);
+            } catch (error) {
+                ResponseUtility.sendFailResponse(res, error);
+            }
+        });
+
+        // /api/core/v1/user/authenticate
+        this.router.post(`${this.path}${URL.AUTH}`, async (req: Request, res: Response) => {
+            try {
+                const auth = req.body as UserAuthDto;
+                const user = await this.userService.authenticate(auth.email, auth.password);
+                if (!user) {
+                    ResponseUtility.sendFailResponse(res, null, 'Invalid email or password');
+                    return;
+                }
+                ResponseUtility.sendSuccess(res, user);
+            } catch (error) {
+                ResponseUtility.sendFailResponse(res, error, error);
+            }
+        });
+
+        // /api/core/v1/user/update-password
+        this.router.post(`${this.path}${URL.CHANGE_PASSWORD}`, passwordMiddleware, async (req: Request, res: Response) => {
+            try {
+                const auth = req.body as UserPasswordDto;
+                const changed = await this.userService.changeUserAuth(auth, req.body.claim);
+                if (changed) {
+                    ResponseUtility.sendSuccess(res, changed);
+                    return;
+                }
+                ResponseUtility.sendFailResponse(res, null, 'Not authorized to update password');
+            } catch (error) {
+                ResponseUtility.sendFailResponse(res, error, error);
+            }
+        });
+    }
 }
+
 export default UserApi;

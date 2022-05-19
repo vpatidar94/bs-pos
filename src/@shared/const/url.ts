@@ -21,7 +21,7 @@ const DETAIL = '/detail';
  */
 export const URL = {
 
-    ADD_UPDATE: ADD_UPDATE,
+    ADD_UPDATE,
 
     MJR_TX: BASE_CORE + '/tx',
     MJR_VEHICLE: BASE_CORE + '/vehicle',
@@ -32,5 +32,8 @@ export const URL = {
     // TX_HISTORY: MJR_TX + '/history',
     ORDER_ALL: '/order-all',
     ORDER_BY_NAME: '/order-by-name',
+
+    AUTH: '/authenticate',
+    CHANGE_PASSWORD: '/update-password'
     
 };
