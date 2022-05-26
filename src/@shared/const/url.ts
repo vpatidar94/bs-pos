@@ -34,6 +34,8 @@ export const URL = {
     ORDER_BY_NAME: '/order-by-name',
 
     AUTH: '/authenticate',
-    CHANGE_PASSWORD: '/update-password'
+    CHANGE_PASSWORD: '/update-password',
+
+    EMP_ADD_UPDATE: '/emp-add-update'
     
 };

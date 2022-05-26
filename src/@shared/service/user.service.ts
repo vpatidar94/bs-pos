@@ -1,10 +1,10 @@
 import {
     AclCustVo,
-    AclVo,
+    AclVo, EmpDepartmentVo,
     JwtClaimDto,
     StringUtility,
     UserAccessDto,
-    UserAuthVo,
+    UserAuthVo, UserEmpDepartmentDto,
     UserPasswordDto,
     UserVo
 } from "codeartist-core";
@@ -13,6 +13,7 @@ import userAuthModel from '../model/user-auth.model';
 import bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import * as dotenv from "dotenv";
+import empDepartmentModel from "../model/emp-department.model";
 
 export class UserService {
     public userAuth = userAuthModel;
@@ -34,6 +35,16 @@ export class UserService {
                 await this._saveUserAuth(user);
                 return await userModel.create(user);
             }
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    public addUpdateEmp = async(emp: UserEmpDepartmentDto): Promise<UserEmpDepartmentDto | null> => {
+        try {
+            emp.emp = await this.saveUser(emp.emp) ?? {} as UserVo;
+            emp.dept = await this.addUpdateDept(emp.emp._id, emp.dept);
+            return emp;
         } catch (error) {
             throw error;
         }
@@ -139,5 +150,14 @@ export class UserService {
         dto.email_verified = true;
         dto.phone_number = user.cell;
         return dto;
+    }
+
+    private addUpdateDept = async (userId: string, dept: EmpDepartmentVo): Promise<EmpDepartmentVo> => {
+        if(dept._id) {
+            return await empDepartmentModel.findByIdAndUpdate(dept._id, dept);
+        } else {
+            dept.userId = userId;
+            return await empDepartmentModel.create(dept);
+        }
     }
 }

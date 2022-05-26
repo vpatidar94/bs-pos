@@ -3,7 +3,7 @@ import {ResponseUtility} from '../utility/response.utility';
 import {Request, Response, Router} from 'express';
 import {Route} from '../interface/route.interface';
 import {UserService} from '../service/user.service';
-import {UserAuthDto, UserPasswordDto, UserVo} from 'codeartist-core';
+import {UserAuthDto, UserEmpDepartmentDto, UserPasswordDto, UserVo} from 'codeartist-core';
 import passwordMiddleware from "../middleware/password.middleware";
 import authMiddleware from "../middleware/auth.middleware";
 
@@ -28,6 +28,20 @@ class UserApi implements Route {
                     return;
                 }
                 ResponseUtility.sendSuccess(res, user);
+            } catch (error) {
+                ResponseUtility.sendFailResponse(res, error);
+            }
+        });
+
+        // /api/core/v1/user/emp-add-update
+        this.router.post(`${this.path}${URL.EMP_ADD_UPDATE}`, authMiddleware, async (req: Request, res: Response) => {
+            try {
+                const emp = await this.userService.addUpdateEmp(req.body as UserEmpDepartmentDto);
+                if (!emp) {
+                    ResponseUtility.sendFailResponse(res, null, 'User already exists');
+                    return;
+                }
+                ResponseUtility.sendSuccess(res, emp);
             } catch (error) {
                 ResponseUtility.sendFailResponse(res, error);
             }
