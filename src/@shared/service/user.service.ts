@@ -43,8 +43,11 @@ export class UserService {
         }
     };
 
-    public addUpdateEmp = async (emp: UserEmpDepartmentDto): Promise<UserEmpDepartmentDto | null> => {
+    public addUpdateEmp = async (dto: UserEmpDepartmentDto): Promise<UserEmpDepartmentDto | null> => {
         try {
+            const emp = {} as UserEmpDepartmentDto;
+            emp.emp = dto.emp;
+            emp.dept = dto.dept;
             emp.emp = await this.saveUser(emp.emp) ?? {} as UserVo;
             emp.dept = await this.addUpdateDept(emp.emp._id, emp.dept);
             return emp;
