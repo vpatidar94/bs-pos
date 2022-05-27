@@ -1,10 +1,13 @@
 import {
     AclCustVo,
-    AclVo, EmpDepartmentVo,
+    AclVo,
+    EmpDepartmentVo,
     JwtClaimDto,
+    ROLE,
     StringUtility,
     UserAccessDto,
-    UserAuthVo, UserEmpDepartmentDto,
+    UserAuthVo,
+    UserEmpDepartmentDto,
     UserPasswordDto,
     UserVo
 } from "codeartist-core";
@@ -40,7 +43,7 @@ export class UserService {
         }
     };
 
-    public addUpdateEmp = async(emp: UserEmpDepartmentDto): Promise<UserEmpDepartmentDto | null> => {
+    public addUpdateEmp = async (emp: UserEmpDepartmentDto): Promise<UserEmpDepartmentDto | null> => {
         try {
             emp.emp = await this.saveUser(emp.emp) ?? {} as UserVo;
             emp.dept = await this.addUpdateDept(emp.emp._id, emp.dept);
@@ -100,6 +103,51 @@ export class UserService {
         }
     };
 
+    public getEmployeeList = async (): Promise<UserEmpDepartmentDto[]> => {
+        try {
+            const list = await this.user.aggregate([
+                {
+                    $match: {
+                        emp: {
+                            $elemMatch: {
+                                role: ROLE.POS_EMP,
+                                active: true
+                            }
+                        }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "empdepartments",
+                        localField: "_id",
+                        foreignField: "userId",
+                        as: "dept",
+                    },
+                },
+                {
+                    $unwind: {
+                        path: '$dept',
+                        "preserveNullAndEmptyArrays": true
+                    }
+                },
+            ]).exec();
+            const ret = [] as UserEmpDepartmentDto[];
+            if (list?.length > 0) {
+                list.forEach((it) => {
+                    const row = it;
+                    const dto = {} as UserEmpDepartmentDto;
+                    dto.dept = row.dept ?? {} as EmpDepartmentVo;
+                    delete row.dept;
+                    dto.emp = row;
+                    ret.push(dto);
+                });
+            }
+            return ret;
+        } catch (e) {
+            throw e;
+        }
+    }
+
     /* ************************************* Private Methods ******************************************** */
     private _saveUserAuth = async (user: UserVo): Promise<void> => {
         const userAuth = {} as UserAuthVo;
@@ -153,7 +201,7 @@ export class UserService {
     }
 
     private addUpdateDept = async (userId: string, dept: EmpDepartmentVo): Promise<EmpDepartmentVo> => {
-        if(dept._id) {
+        if (dept._id) {
             return await empDepartmentModel.findByIdAndUpdate(dept._id, dept);
         } else {
             dept.userId = userId;

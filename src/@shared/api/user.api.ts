@@ -47,6 +47,20 @@ class UserApi implements Route {
             }
         });
 
+        // /api/core/v1/user/emp-list
+        this.router.get(`${this.path}${URL.EMP_LIST}`, authMiddleware, async (req: Request, res: Response) => {
+            try {
+                const list = await this.userService.getEmployeeList();
+                if (!list) {
+                    ResponseUtility.sendFailResponse(res, null);
+                    return;
+                }
+                ResponseUtility.sendSuccess(res, list);
+            } catch (error) {
+                ResponseUtility.sendFailResponse(res, error);
+            }
+        });
+
         // /api/core/v1/user/authenticate
         this.router.post(`${this.path}${URL.AUTH}`, async (req: Request, res: Response) => {
             try {

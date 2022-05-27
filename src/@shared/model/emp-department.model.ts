@@ -2,7 +2,7 @@ import * as mongoose from 'mongoose';
 import {EmpDepartmentVo} from "codeartist-core";
 
 const schema = new mongoose.Schema({
-  userId: {},
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   type: {
     type: String,
     enum: ['DISTRIBUTION', "COUNTER"]

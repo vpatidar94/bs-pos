@@ -36,6 +36,6 @@ export const URL = {
     AUTH: '/authenticate',
     CHANGE_PASSWORD: '/update-password',
 
-    EMP_ADD_UPDATE: '/emp-add-update'
-    
+    EMP_ADD_UPDATE: '/emp-add-update',
+    EMP_LIST: '/emp-list'
 };
