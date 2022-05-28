@@ -2,12 +2,12 @@ import * as mongoose from 'mongoose';
 import {DEPT, EmpDepartmentVo} from "codeartist-core";
 
 const schema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  type: {
-    type: String,
-    enum:  [DEPT.DISTRIBUTION, DEPT.COUNTER]
-  },
-  name: String
+    userId: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+    type: {
+        type: String,
+        enum: [DEPT.DISTRIBUTION, DEPT.COUNTER]
+    },
+    name: {type: mongoose.Schema.Types.ObjectId, ref: 'route_counter'},
 });
 
 const empDepartmentModel = mongoose.model<EmpDepartmentVo & mongoose.Document>('EmpDepartment', schema);
