@@ -22,10 +22,12 @@ const DETAIL = '/detail';
 export const URL = {
 
     ADD_UPDATE,
+    LIST,
 
     MJR_TX: BASE_CORE + '/tx',
     MJR_VEHICLE: BASE_CORE + '/vehicle',
     MJR_USER: BASE_CORE + '/user',
+    MJR_ROUTE_COUNTER: BASE_CORE + '/route-counter',
 
     VEHICLE_LIST: LIST,
     // ORDER: MJR_TX + '/order',

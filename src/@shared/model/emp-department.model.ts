@@ -1,11 +1,11 @@
 import * as mongoose from 'mongoose';
-import {EmpDepartmentVo} from "codeartist-core";
+import {DEPT, EmpDepartmentVo} from "codeartist-core";
 
 const schema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   type: {
     type: String,
-    enum: ['DISTRIBUTION', "COUNTER"]
+    enum:  [DEPT.DISTRIBUTION, DEPT.COUNTER]
   },
   name: String
 });

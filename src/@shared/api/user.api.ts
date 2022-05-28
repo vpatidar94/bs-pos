@@ -41,7 +41,7 @@ class UserApi implements Route {
                     ResponseUtility.sendFailResponse(res, null, 'User already exists');
                     return;
                 }
-                ResponseUtility.sendSuccess(res, emp);
+                ResponseUtility.sendSuccess(res, emp, 'Employee Added Successfully');
             } catch (error) {
                 ResponseUtility.sendFailResponse(res, error);
             }
