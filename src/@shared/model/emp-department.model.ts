@@ -7,7 +7,7 @@ const schema = new mongoose.Schema({
         type: String,
         enum: [DEPT.DISTRIBUTION, DEPT.COUNTER]
     },
-    name: {type: mongoose.Schema.Types.ObjectId, ref: 'route_counter'},
+    routeCounterId: {type: mongoose.Schema.Types.ObjectId, ref: 'route_counter'},
 });
 
 const empDepartmentModel = mongoose.model<EmpDepartmentVo & mongoose.Document>('EmpDepartment', schema);
