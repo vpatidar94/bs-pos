@@ -65,7 +65,7 @@ export class UserService {
             customer.cust = dto.cust;
             customer.custType = dto.custType;
             customer.cust = await this.saveUser(customer.cust) ?? {} as UserVo;
-            customer.custType = await this.addUpdateCustomerType(customer.custType._id, customer.custType);
+            customer.custType = await this.addUpdateCustomerType(customer.cust._id, customer.custType);
             return customer;
         } catch (error) {
             throw error;
@@ -172,7 +172,7 @@ export class UserService {
             const list = await this.user.aggregate([
                 {
                     $match: {
-                        emp: {
+                        cust: {
                             $elemMatch: {
                                 role: ROLE.POS_CUST,
                                 active: true
@@ -190,7 +190,7 @@ export class UserService {
                 },
                 {
                     $unwind: {
-                        path: 'custType',
+                        path: '$custType',
                         "preserveNullAndEmptyArrays": true
                     }
                 },
