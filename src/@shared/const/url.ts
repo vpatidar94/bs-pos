@@ -39,5 +39,7 @@ export const URL = {
     CHANGE_PASSWORD: '/update-password',
 
     EMP_ADD_UPDATE: '/emp-add-update',
-    EMP_LIST: '/emp-list'
+    CUST_ADD_UPDATE: '/cust-add-update',
+    EMP_LIST: '/emp-list',
+    CUST_LIST: '/cust-list'
 };

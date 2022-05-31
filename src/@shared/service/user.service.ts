@@ -1,12 +1,14 @@
 import {
     AclCustVo,
     AclVo,
+    CustTypeVo,
     EmpDepartmentVo,
     JwtClaimDto,
     ROLE,
     StringUtility,
     UserAccessDto,
     UserAuthVo,
+    UserCustTypeDto,
     UserEmpDepartmentDto,
     UserPasswordDto,
     UserVo
@@ -17,6 +19,7 @@ import bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import * as dotenv from "dotenv";
 import empDepartmentModel from "../model/emp-department.model";
+import custTypeModel from "../model/cust-type.model";
 
 export class UserService {
     public userAuth = userAuthModel;
@@ -51,6 +54,19 @@ export class UserService {
             emp.emp = await this.saveUser(emp.emp) ?? {} as UserVo;
             emp.dept = await this.addUpdateDept(emp.emp._id, emp.dept);
             return emp;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    public addUpdateCustomer = async (dto: UserCustTypeDto): Promise<UserCustTypeDto | null> => {
+        try {
+            const customer = {} as UserCustTypeDto;
+            customer.cust = dto.cust;
+            customer.custType = dto.custType;
+            customer.cust = await this.saveUser(customer.cust) ?? {} as UserVo;
+            customer.custType = await this.addUpdateCustomerType(customer.custType._id, customer.custType);
+            return customer;
         } catch (error) {
             throw error;
         }
@@ -151,6 +167,51 @@ export class UserService {
         }
     }
 
+    public getCustomerList = async (): Promise<UserCustTypeDto[]> => {
+        try {
+            const list = await this.user.aggregate([
+                {
+                    $match: {
+                        emp: {
+                            $elemMatch: {
+                                role: ROLE.POS_CUST,
+                                active: true
+                            }
+                        }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "cust_types",
+                        localField: "_id",
+                        foreignField: "userId",
+                        as: "custType",
+                    },
+                },
+                {
+                    $unwind: {
+                        path: 'custType',
+                        "preserveNullAndEmptyArrays": true
+                    }
+                },
+            ]).exec();
+            const ret = [] as UserCustTypeDto[];
+            if (list?.length > 0) {
+                list.forEach((it) => {
+                    const row = it;
+                    const dto = {} as UserCustTypeDto;
+                    dto.custType = row.custType ?? {} as CustTypeVo;
+                    delete row.custType;
+                    dto.cust = row;
+                    ret.push(dto);
+                });
+            }
+            return ret;
+        } catch (e) {
+            throw e;
+        }
+    }
+
     /* ************************************* Private Methods ******************************************** */
     private _saveUserAuth = async (user: UserVo): Promise<void> => {
         const userAuth = {} as UserAuthVo;
@@ -209,6 +270,15 @@ export class UserService {
         } else {
             dept.userId = userId;
             return await empDepartmentModel.create(dept);
+        }
+    }
+
+    private addUpdateCustomerType = async (userId: string, custType: CustTypeVo): Promise<CustTypeVo> => {
+        if (custType._id) {
+            return await custTypeModel.findByIdAndUpdate(custType._id, custType);
+        } else {
+            custType.userId = userId;
+            return await custTypeModel.create(custType);
         }
     }
 }

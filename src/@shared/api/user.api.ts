@@ -3,7 +3,7 @@ import {ResponseUtility} from '../utility/response.utility';
 import {Request, Response, Router} from 'express';
 import {Route} from '../interface/route.interface';
 import {UserService} from '../service/user.service';
-import {UserAuthDto, UserEmpDepartmentDto, UserPasswordDto, UserVo} from 'codeartist-core';
+import {UserAuthDto, UserCustTypeDto, UserEmpDepartmentDto, UserPasswordDto, UserVo} from 'codeartist-core';
 import passwordMiddleware from "../middleware/password.middleware";
 import authMiddleware from "../middleware/auth.middleware";
 
@@ -47,10 +47,38 @@ class UserApi implements Route {
             }
         });
 
+        // /api/core/v1/user/cust-add-update
+        this.router.post(`${this.path}${URL.CUST_ADD_UPDATE}`, authMiddleware, async (req: Request, res: Response) => {
+            try {
+                const emp = await this.userService.addUpdateCustomer(req.body as UserCustTypeDto);
+                if (!emp) {
+                    ResponseUtility.sendFailResponse(res, null, 'User already exists');
+                    return;
+                }
+                ResponseUtility.sendSuccess(res, emp, 'Customer Added Successfully');
+            } catch (error) {
+                ResponseUtility.sendFailResponse(res, error);
+            }
+        });
+
         // /api/core/v1/user/emp-list
         this.router.get(`${this.path}${URL.EMP_LIST}`, authMiddleware, async (req: Request, res: Response) => {
             try {
                 const list = await this.userService.getEmployeeList();
+                if (!list) {
+                    ResponseUtility.sendFailResponse(res, null);
+                    return;
+                }
+                ResponseUtility.sendSuccess(res, list);
+            } catch (error) {
+                ResponseUtility.sendFailResponse(res, error);
+            }
+        });
+
+        // /api/core/v1/user/cust-list
+        this.router.get(`${this.path}${URL.CUST_LIST}`, authMiddleware, async (req: Request, res: Response) => {
+            try {
+                const list = await this.userService.getCustomerList();
                 if (!list) {
                     ResponseUtility.sendFailResponse(res, null);
                     return;
